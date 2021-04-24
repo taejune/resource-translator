@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+mainClassName = 'k8s.util.ResourceConverter'
+
+jar {
+    manifest {
+        attributes 'Title': 'Schema Converter', 'Main-Class': mainClassName
+    }
+    archiveName 'SchemaConverter.jar'
+    dependsOn configurations.runtime
+    from {
+        configurations.compile.collect {it.isDirectory()? it: zipTree(it)}
+    }
+}
+
+repositories {
+//    mavenCentral()
+    jcenter()
+}
+
+
+dependencies {
+//    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+//    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'org.apache.poi:poi:5.0.0'
+    implementation platform('com.google.cloud:libraries-bom:18.0.0')
+    compile 'com.google.cloud:google-cloud-translate'
+    compile('com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.7.4')
+}
+
+//test {
+//    useJUnitPlatform()
+//}

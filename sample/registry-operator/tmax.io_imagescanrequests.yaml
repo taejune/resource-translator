@@ -1,0 +1,156 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
+  name: imagescanrequests.tmax.io
+spec:
+  additionalPrinterColumns:
+  - JSONPath: .status.status
+    name: STATUS
+    type: string
+  - JSONPath: .metadata.creationTimestamp
+    name: AGE
+    type: date
+  group: tmax.io
+  names:
+    kind: ImageScanRequest
+    listKind: ImageScanRequestList
+    plural: imagescanrequests
+    shortNames:
+    - icr
+    singular: imagescanrequest
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: ImageScanRequest is the Schema for the imagescanrequests API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: ImageScanRequestSpec defines the desired state of ImageScanRequest
+          properties:
+            insecure:
+              description: Do not verify registry server's certificate
+              type: boolean
+            maxFixable:
+              description: The number of fixable issues allowable
+              type: integer
+            scanTargets:
+              items:
+                description: ScanTarget is a target setting to scan images
+                properties:
+                  certificateSecret:
+                    description: The name of certificate secret for private registry.
+                    type: string
+                  imagePullSecret:
+                    description: The name of secret containing login credential of
+                      registry
+                    type: string
+                  images:
+                    description: 'Image path (example: library/alpine:3)'
+                    items:
+                      type: string
+                    type: array
+                  registryUrl:
+                    description: 'Registry URL (example: docker.io)'
+                    type: string
+                required:
+                - images
+                - registryUrl
+                type: object
+              type: array
+            sendReport:
+              description: Whether to send result to report server
+              type: boolean
+          required:
+          - scanTargets
+          type: object
+        status:
+          description: ImageScanRequestStatus defines the observed state of ImageScanRequest
+          properties:
+            message:
+              description: Scan message for status
+              type: string
+            reason:
+              description: Scan error reason
+              type: string
+            results:
+              additionalProperties:
+                description: ScanResult is result of scanning an image
+                properties:
+                  fatal:
+                    description: Scan fatal message
+                    items:
+                      type: string
+                    type: array
+                  summary:
+                    additionalProperties:
+                      type: integer
+                    description: Scan summary
+                    type: object
+                  vulnerabilities:
+                    additionalProperties:
+                      description: Vulnerabilities is a set of Vulnerability instances
+                      items:
+                        description: Vulnerability is the information of the vulnerability
+                          found.
+                        properties:
+                          Description:
+                            description: Description for severity
+                            type: string
+                          FixedBy:
+                            description: Metadata Metadata runtime.RawExtension `json:"Metadata,omitempty"`
+                              Fixed version
+                            type: string
+                          Link:
+                            description: Description link
+                            type: string
+                          Name:
+                            description: Severity name
+                            type: string
+                          NamespaceName:
+                            description: Severity namespace
+                            type: string
+                          Severity:
+                            description: Severity degree
+                            type: string
+                        type: object
+                      type: array
+                    description: Scan vulnerabilities
+                    type: object
+                type: object
+              description: 'Scna results {docker.io/library/alpine:3: {summary : {"Low"
+                : 1, "Medium" : 2, ...}}'
+              type: object
+            status:
+              description: Scan status
+              type: string
+          type: object
+      type: object
+  version: v1
+  versions:
+  - name: v1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
